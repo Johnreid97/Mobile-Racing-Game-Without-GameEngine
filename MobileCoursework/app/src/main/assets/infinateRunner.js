@@ -63,8 +63,7 @@ class aSprite {
  var canvasContext;
  var travel=0;
  var player;
- var enemyRespawn = 400;
- var carSpeed = 2;
+ 
 
  var mouseX;
  var mouseY;
@@ -107,7 +106,6 @@ class aSprite {
  player = new aSprite(0,0,"Audi.png",  "Generic");
  
  player.setPos(0 ,600);
- //enemies[0].setPos(100,400);
  startTimeMS = Date.now();
  gameLoop();
  }
@@ -126,6 +124,7 @@ class aSprite {
  update(elapsed);
  render(elapsed);
  startTimeMS = Date.now();
+ collisionDetection();
  requestAnimationFrame(gameLoop);
  }
 
@@ -134,13 +133,16 @@ class aSprite {
  function render(delta) {
  //canvasContext.clearRect(0,0,canvas.width, canvas.height);
  background.scrollBK(travel);
-
+ 
  for (var i = 0; i < enemies.length; i++)
  {
-     enemy.setPos(enemies[i].x, enemies[i].y);
+	 getRandomPos(0, 100);
+	 enemies[i].x = obstacleX;
+	 enemies[i].y = obstacleY;
+     enemy.setPos(obstacleX, obstacleY);
      enemy.render();
-     enemies[i].y += carSpeed;
-    //canvasContext.drawImage(enemy.sImage, enemies[i].x, enemies[i].y);
+     obstacleY += carSpeed;
+   
      if (enemies[i].y == enemyRespawn)
      {
      enemies.push({
@@ -150,11 +152,18 @@ class aSprite {
      //y: 600
 
      });
-
+		
      }
-     player.render();
+	 
+	 if ( player.x < enemies[i].x + (enemy.sImage.width/2) && player.x + player.sImage.width > enemies[i].x && player.y < enemies[i].y + enemy.sImage.height && player.y + player.sImage.height > enemies[i].y)
+	 {
+	  location.reload();
+	  console.log(1);
+   }
+	 
+     
  }
-
+  player.render();
  }
 
  function update(delta)
@@ -164,7 +173,10 @@ class aSprite {
 
  function collisionDetection()
  {
-
+   if (player.x >= enemy.x && player.x <= enemy.x + enemy.width &&(player.y >= enemy.y  || enemy.y + enemy.height <= enemy.y)){
+	  // location.reload();
+	  console.log("We colliding bois 2");
+   }
  }
 
  function styleText(txtColour, txtFont, txtAlign, txtBaseline)
