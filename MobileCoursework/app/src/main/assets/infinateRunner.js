@@ -2,11 +2,14 @@
 document.write("<script src='Obstacles.js' type='text/javascript'></script>");
 document.write("<script src='Inputs.js' type='text/javascript'></script>");
 
-class aSprite {
- constructor(x, y, imageSRC, spType){
+class aSprite 
+{
+ constructor(x, y, ScaleX, ScaleY, imageSRC, spType){
  //this.zindex = 0;
  this.x = x;
  this.y = y;
+ this.sizeX = ScaleX;
+ this.sizeY = ScaleY;
  this.sType = spType;
  this.sImage = new Image();
  this.sImage.src = imageSRC;
@@ -16,26 +19,62 @@ class aSprite {
  // Method
  render()
  {
- canvasContext.drawImage(this.sImage,this.x, this.y);
+ canvasContext.save();
+ canvasContext.scale(this.sizeX,this.sizeY);
+ canvasContext.drawImage(this.sImage,this.x, this.y, this.sImage.width,this.sImage.height);
+ canvasContext.restore();
  }
+
+//  backgroundControl()
+//  {
+//    this.widthdiff = canvas.width +  this.sImage.width;
+//    this.heightdiff = canvas.height + this.sImage.height;
+
+//    this.newWidth = this.sImage.width - this.widthdiff;
+//    this.newheight = this.sImage.height - this.heightdiff;
+
+
+//  }
+
  // Method
  scrollBK(delta)
  {
 
  canvasContext.save();
+ canvasContext.scale(this.sizeX,this.sizeY);
  canvasContext.translate( 0, delta);
  
- canvasContext.drawImage(this.sImage,0, 0);
- canvasContext.drawImage(this.sImage, 0, this.sImage.height);
- canvasContext.drawImage(this.sImage, 0, this.sImage.height *2)
+  canvasContext.drawImage(this.sImage, 0, -this.sImage.height, canvas.width/4, this.sImage.height);
+  canvasContext.drawImage(this.sImage,0, 0, canvas.width/4, this.sImage.height);
+  canvasContext.drawImage(this.sImage, 0, this.sImage.height,canvas.width/4, this.sImage.height);
+  canvasContext.drawImage(this.sImage, 0, this.sImage.height*2 ,canvas.width/4, this.sImage.height)
  
  canvasContext.restore();
  }
+
+ // Getter
+ get xPos()
+{
+  return this.x;
+}
+
+get yPos(){
+  return this.y;
+}
+
  // Method
- setPos(newX,newY){
+ setPos(newX,newY)
+ {
  this.x = newX;
  this.y = newY;
  }
+
+  lerp (value1, value2, amount) 
+{
+  amount = amount < 0 ? 0 : amount;
+  amount = amount > 1 ? 1 : amount;
+  return value1 + (value2 - value1) * amount;
+}
 
  // Static Method
  static distance(a, b)
@@ -47,23 +86,20 @@ class aSprite {
  }
 
  // Method
- spriteType(){
+ spriteType()
+ {
  console.log('I am an instance of aSprite!!!');
  }
 
  }
 
-
-
-
-
-
-
  var canvas;
  var canvasContext;
  var travel=0;
  var player;
- 
+ var enemySpawn;
+ var score  = 0;
+ var elapsed;
 
  var mouseX;
  var mouseY;
@@ -72,7 +108,8 @@ class aSprite {
 
 
 
- function resizeCanvas() {
+ function resizeCanvas() 
+ {
  canvas.width = window.innerWidth;
  canvas.height = window.innerHeight;
  }
@@ -84,11 +121,14 @@ class aSprite {
  init();
  }
 
- function init() {
 
+ function init() 
+ {
+
+  //var obstacleclass = new obstacle();
  if (canvas.getContext) {
  //Set Event Listeners for window, mouse and touch
-
+ 
  window.addEventListener('resize', resizeCanvas, false);
  window.addEventListener('orientationchange', resizeCanvas, false);
 
@@ -102,20 +142,23 @@ class aSprite {
 
  resizeCanvas();
 
- background = new aSprite(0,0,"Road.jpg", "Generic");
- player = new aSprite(0,0,"Audi.png",  "Generic");
+ background = new aSprite(0,0,4,4,"Road.jpg", "Generic");
+ player = new aSprite(0,0,4,4,"Audi.png",  "Generic");
  
- player.setPos(0 ,600);
+ player.setPos((canvas.width - player.sImage.width)/9, (canvas.height - player.sImage.height) /5);
+ console.log(player.x);
  startTimeMS = Date.now();
+
+ enemySpawn = setInterval(spawnenemies, enemyRespawn);
  gameLoop();
  }
  }
 
- function gameLoop(){
+ function gameLoop()
+ {
  console.log("gameLoop");
- var elapsed = (Date.now() - startTimeMS)/1000;
+ elapsed = (Date.now() - startTimeMS)/1000;
  travel += elapsed * 100;
-
  if (travel > background.sImage.height)
  {
  travel = 0;
@@ -125,58 +168,42 @@ class aSprite {
  render(elapsed);
  startTimeMS = Date.now();
  collisionDetection();
+ scoreScaling();
  requestAnimationFrame(gameLoop);
  }
 
 
 
- function render(delta) {
- //canvasContext.clearRect(0,0,canvas.width, canvas.height);
+ function render(delta) 
+ {
+ canvasContext.clearRect(0,0,canvas.width, canvas.height);
+ //background.backgroundControl();
  background.scrollBK(travel);
  
+ canvasContext.strokeRect(1,1, canvas.width-2, canvas.height - 2);
  for (var i = 0; i < enemies.length; i++)
  {
-	 getRandomPos(0, 100);
-	 enemies[i].x = obstacleX;
-	 enemies[i].y = obstacleY;
-     enemy.setPos(obstacleX, obstacleY);
+     enemy.setPos(enemies[i].x, enemies[i].y);
      enemy.render();
-     obstacleY += carSpeed;
-   
-     if (enemies[i].y == enemyRespawn)
-     {
-     enemies.push({
-       x: 50,
-       y: 0
-     //x: Math.floor(Math.random * background.width) -background.width,
-     //y: 600
+     enemies[i].y += carSpeed; 
+    
 
-     });
-		
-     }
-	 
-	 if ( player.x < enemies[i].x + (enemy.sImage.width/2) && player.x + player.sImage.width > enemies[i].x && player.y < enemies[i].y + enemy.sImage.height && player.y + player.sImage.height > enemies[i].y)
+	 if ( player.x < enemies[i].x + (enemy.sImage.width/2) && player.x + (player.sImage.width/2) > enemies[i].x && player.y < enemies[i].y + (enemy.sImage.height/2) && player.y + (player.sImage.height/2) > enemies[i].y)
 	 {
 	  location.reload();
-	  console.log(1);
-   }
-	 
-     
+   }    
  }
   player.render();
  }
 
  function update(delta)
  {
-
+ 
  }
 
  function collisionDetection()
  {
-   if (player.x >= enemy.x && player.x <= enemy.x + enemy.width &&(player.y >= enemy.y  || enemy.y + enemy.height <= enemy.y)){
-	  // location.reload();
-	  console.log("We colliding bois 2");
-   }
+
  }
 
  function styleText(txtColour, txtFont, txtAlign, txtBaseline)
@@ -186,6 +213,25 @@ class aSprite {
  canvasContext.textAlign = txtAlign;
  canvasContext.textBaseline = txtBaseline;
  }
+
+ function scoreScaling()
+ {
+   //console.log(score);
+   score += elapsed *10;
+
+   if (score > 10)
+   {
+    //clearInterval(enemySpawn);
+    enemyRespawn = 3000;
+   // setInterval(spawnenemies,2000);
+   }
+   canvasContext.fillStyle = "blue";
+   canvasContext.font = "bold 100px Comic Sans";
+   canvasContext.fillText("Score : " + score.toString().substr(0,4), canvas.width/2, 100);
+ }
+ 
+
+ 
 
 
 	 

@@ -31,16 +31,14 @@
  }
 
 
-
-
  function KeyDown(evt)
  {
-     mouseX = evt.clientX;
+    mouseX = evt.clientX;
 	 mouseY = evt.clientY;
 
 if (mousedownID == -1)
 {
-	mousedownID = setInterval(whilemousedown, 100);
+	mousedownID = setInterval(whilemousedown, 10);
 }
 
  }
@@ -48,12 +46,14 @@ if (mousedownID == -1)
  function whilemousedown()
  {
 
-     if (mouseX > background.sImage.width/2)
+     if (mouseX > canvas.width/2)
    {
-      player.x +=10;
+      //player.x = player.lerp(player.x, mouseX, 0.01);
+      player.x += 5;
    }
-   else if(mouseX < background.sImage.width/2)
+   else if(mouseX < canvas.width/2)
    {
-      player.x -=10;
+      //player.x = player.lerp(player.x, mouseX, 0.01);
+      player.x -= 5;
    }
  }
