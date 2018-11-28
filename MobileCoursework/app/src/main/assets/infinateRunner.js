@@ -13,6 +13,8 @@ class aSprite
  this.sType = spType;
  this.sImage = new Image();
  this.sImage.src = imageSRC;
+ 
+ 
  }
 
 
@@ -27,22 +29,7 @@ class aSprite
 
 
 
- // Method
- scrollBK(delta)
- {
-
- canvasContext.save();
- canvasContext.scale(this.sizeX,this.sizeY);
- canvasContext.translate( 0, delta);
  
- canvasContext.drawImage(this.sImage, 0, -this.sImage.height, canvas.width/4, this.sImage.height);
- canvasContext.drawImage(this.sImage,0, 0, canvas.width/4, this.sImage.height);
- canvasContext.drawImage(this.sImage, 0, this.sImage.height,canvas.width/4, this.sImage.height);
- canvasContext.drawImage(this.sImage, 0, -this.sImage.height*2 ,canvas.width/4, this.sImage.height)
- 
- canvasContext.restore();
- }
-
  // Getter
  get xPos()
 {
@@ -53,6 +40,16 @@ get yPos(){
   return this.y;
 }
 
+// get collider() 
+// {
+//   var rect = {x: this.x + this.collX, 
+//               y: this.y + this.collY, 
+//               width: this.collWidth,
+//               height: this.collHeight}
+
+// return rect;
+//}
+
  // Method
  setPos(newX,newY)
  {
@@ -60,12 +57,12 @@ get yPos(){
  this.y = newY;
  }
 
-  lerp (value1, value2, amount) 
-{
-  amount = amount < 0 ? 0 : amount;
-  amount = amount > 1 ? 1 : amount;
-  return value1 + (value2 - value1) * amount;
-}
+ drawCollider()
+ {
+  //canvasContext.strokeRect(this.collider.x,this.collider.y, this.collider.colliderWidth, this.collider.colliderHeight);
+ // canvasContext.strokeRect(this.x +70, this.y +25, (this.sImage.width/2) -20,this.sImage.height - 30);
+  canvasContext.strokeRect(this.x + 73, this.y+ 10, (this.sImage.width/2)-20 ,this.sImage.height-30 );
+ }
 
 //  // Static Method
 //  static distance(a, b)
@@ -81,6 +78,35 @@ get yPos(){
  {
  console.log('I am an instance of aSprite!!!');
  }
+
+ collisionDetection(target)
+ {
+  if ( this.x +70 < ((target.x+73) + ((target.sImage.width/2 -20))) && ((this.x +70) + ((this.sImage.width/2)-20)) > target.x + 73 && this.y +25 < ((target.y+10) + (target.sImage.height-30)) && ((this.y +25) + (this.sImage.height-30)) > target.y +10)
+  {
+   location.reload();
+  }  
+ }
+
+ }
+
+ class bkrnd extends aSprite
+ {
+  // Method
+ scrollBK(delta)
+ {
+
+ canvasContext.save();
+ canvasContext.scale(this.sizeX,this.sizeY);
+ canvasContext.translate( 0, delta);
+ 
+ canvasContext.drawImage(this.sImage, 0, -this.sImage.height, canvas.width/4, this.sImage.height);
+ canvasContext.drawImage(this.sImage,0, 0, canvas.width/4, this.sImage.height);
+ canvasContext.drawImage(this.sImage, 0, this.sImage.height,canvas.width/4, this.sImage.height);
+ canvasContext.drawImage(this.sImage, 0, -this.sImage.height*2 ,canvas.width/4, this.sImage.height)
+ 
+ canvasContext.restore();
+ }
+
 
  }
 
@@ -133,10 +159,10 @@ get yPos(){
 
  resizeCanvas();
 
- background = new aSprite(0,0,4,4,"Road.jpg", "Generic");
- player = new aSprite(0,0,4,4,"Audi.png",  "Generic");
+ background = new bkrnd(0,0,4,4,"Road.jpg", "Generic");
+ player = new aSprite(0,0,1,1,"Audi.png",  "Generic",);
  
- player.setPos((canvas.width - player.sImage.width)/10, (canvas.height - player.sImage.height) /6);
+ player.setPos((canvas.width - player.sImage.width)/2, ( canvas.height - player.sImage.height )/1.3);
  //console.log(player.x);
  startTimeMS = Date.now();
 
@@ -147,6 +173,7 @@ get yPos(){
 
  function gameLoop()
  {
+  
  console.log("gameLoop");
  elapsed = (Date.now() - startTimeMS)/1000;
  travel += elapsed * 100;
@@ -158,8 +185,10 @@ get yPos(){
  update(elapsed);
  render(elapsed);
  startTimeMS = Date.now();
- collisionDetection();
- scoreScaling();
+ 
+ scoreCount();
+
+ //player.drawCollider();
  requestAnimationFrame(gameLoop);
  }
 
@@ -168,34 +197,32 @@ get yPos(){
  function render(delta) 
  {
  canvasContext.clearRect(0,0,canvas.width, canvas.height);
- //background.backgroundControl();
+ 
  background.scrollBK(travel * 2);
  
- //canvasContext.strokeRect(1,1, canvas.width-2, canvas.height - 2);
+ //canvasContext.strokeRect(1,1, canvas.width-4, canvas.height - 4);
  for (var i = 0; i < enemies.length; i++)
  {
     
-     enemies[i].render();
+     enemies[i].render(); 
      enemies[i].y += carSpeed; 
-    
 
-	 if ( player.x < enemies[i].x + (enemy.sImage.width/2) && player.x + (player.sImage.width/2) > enemies[i].x && player.y < enemies[i].y + (enemy.sImage.height/2) && player.y + (player.sImage.height/2) > enemies[i].y)
-	 {
-	  location.reload();
-   }    
+     enemies[i].collisionDetection(player); 
+	//  if ( player.x +70 < ((enemies[i].x+73) + ((enemies[i].sImage.width/2 -20))) && ((player.x +70) + ((player.sImage.width/2)-20)) > enemies[i].x + 73 && player.y +25 < ((enemies[i].y+10) + (enemies[i].sImage.height-30)) && ((player.y +25) + (player.sImage.height-30)) > enemies[i].y +10)
+	//  {
+  //   location.reload();
+    
+  //  }    
  }
   player.render();
  }
 
  function update(delta)
  {
- 
+  worldWrap();
  }
 
- function collisionDetection()
- {
 
- }
 
  function styleText(txtColour, txtFont, txtAlign, txtBaseline)
  {
@@ -205,7 +232,7 @@ get yPos(){
  canvasContext.textBaseline = txtBaseline;
  }
 
- function scoreScaling()
+ function scoreCount()
  {
    //console.log(score);
    score += elapsed *10;
@@ -213,18 +240,28 @@ get yPos(){
    if (score > 100)
    {
 
-    //clearInterval(enemySpawn);
-    //enemyRespawn = 3000;
-   // setInterval(spawnenemies,2000);
-     carSpeed = 4;
+    
   }
    canvasContext.fillStyle = "blue";
-   canvasContext.font = "bold 100px Comic Sans";
-   canvasContext.fillText("Score : " + score.toString().substr(0,4), canvas.width/2, 100);
+   canvasContext.font = "bold 50px Comic Sans";
+   canvasContext.fillText("Score : " + score.toString().substr(0,4), background.x + 200, 100);
  }
  
 
- 
+ function worldWrap()
+ {
+  if (player.x > canvas.width)
+  {
+    player.setPos(0,player.y);
+  }
+  if (player.x < 0)
+  {
+    player.setPos(canvas.width,player.y);
+  }
+
+
+ }
+
 
 
 	 

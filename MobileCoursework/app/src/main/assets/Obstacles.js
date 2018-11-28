@@ -1,17 +1,14 @@
 class obsatcles extends aSprite
 {
-    randomMovement()
+    speedUp()
     {
-        
+        carspeed++;
     }
 
 }
 
 
-    
-  
 
-var enemy = new aSprite(100,400, 4, 4, "Police.PNG", "Generic");
 var enemies = [];
 
 var enemyRespawn = 2000;
@@ -20,13 +17,13 @@ var obstacleX = 100;
 var obstacleY = 0; 
 var bkgrndOffset = 50;
     
-enemies[0] = new aSprite (0,0,4,4,"Police.PNG", "Generic" )
-{
-    this.x = obstacleX;
-    this.y = obstacleY;
+// enemies[0] = new obsatcles (0,0,1,,"Police.PNG", "Generic" )
+// {
+//     this.x = obstacleX;
+//     this.y = obstacleY;
     
 
-};
+// };
 
 function getRandomPos(min, max)
 {
@@ -36,9 +33,9 @@ function getRandomPos(min, max)
 
 function spawnenemies()
 {
-    getRandomPos(0, canvas.width/4.5);
+    getRandomPos(0, canvas.width);
     
-    enemies.push(new aSprite (obstacleX,obstacleY,4,4,"Police.PNG", "Generic"))
+    enemies.push(new obsatcles (obstacleX,obstacleY,1,1,"Police.PNG", "Generic"))
 
 }
 
