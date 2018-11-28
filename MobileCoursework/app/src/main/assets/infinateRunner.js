@@ -25,16 +25,7 @@ class aSprite
  canvasContext.restore();
  }
 
-//  backgroundControl()
-//  {
-//    this.widthdiff = canvas.width +  this.sImage.width;
-//    this.heightdiff = canvas.height + this.sImage.height;
 
-//    this.newWidth = this.sImage.width - this.widthdiff;
-//    this.newheight = this.sImage.height - this.heightdiff;
-
-
-//  }
 
  // Method
  scrollBK(delta)
@@ -44,10 +35,10 @@ class aSprite
  canvasContext.scale(this.sizeX,this.sizeY);
  canvasContext.translate( 0, delta);
  
-  canvasContext.drawImage(this.sImage, 0, -this.sImage.height, canvas.width/4, this.sImage.height);
-  canvasContext.drawImage(this.sImage,0, 0, canvas.width/4, this.sImage.height);
-  canvasContext.drawImage(this.sImage, 0, this.sImage.height,canvas.width/4, this.sImage.height);
-  canvasContext.drawImage(this.sImage, 0, this.sImage.height*2 ,canvas.width/4, this.sImage.height)
+ canvasContext.drawImage(this.sImage, 0, -this.sImage.height, canvas.width/4, this.sImage.height);
+ canvasContext.drawImage(this.sImage,0, 0, canvas.width/4, this.sImage.height);
+ canvasContext.drawImage(this.sImage, 0, this.sImage.height,canvas.width/4, this.sImage.height);
+ canvasContext.drawImage(this.sImage, 0, -this.sImage.height*2 ,canvas.width/4, this.sImage.height)
  
  canvasContext.restore();
  }
@@ -76,14 +67,14 @@ get yPos(){
   return value1 + (value2 - value1) * amount;
 }
 
- // Static Method
- static distance(a, b)
- {
- const dx = a.x - b.x;
- const dy = a.y - b.y;
+//  // Static Method
+//  static distance(a, b)
+//  {
+//  const dx = a.x - b.x;
+//  const dy = a.y - b.y;
 
- return Math.hypot(dx, dy);
- }
+//  return Math.hypot(dx, dy);
+//  }
 
  // Method
  spriteType()
@@ -95,7 +86,7 @@ get yPos(){
 
  var canvas;
  var canvasContext;
- var travel=0;
+ var travel = 0;
  var player;
  var enemySpawn;
  var score  = 0;
@@ -145,8 +136,8 @@ get yPos(){
  background = new aSprite(0,0,4,4,"Road.jpg", "Generic");
  player = new aSprite(0,0,4,4,"Audi.png",  "Generic");
  
- player.setPos((canvas.width - player.sImage.width)/9, (canvas.height - player.sImage.height) /5);
- console.log(player.x);
+ player.setPos((canvas.width - player.sImage.width)/10, (canvas.height - player.sImage.height) /6);
+ //console.log(player.x);
  startTimeMS = Date.now();
 
  enemySpawn = setInterval(spawnenemies, enemyRespawn);
@@ -178,13 +169,13 @@ get yPos(){
  {
  canvasContext.clearRect(0,0,canvas.width, canvas.height);
  //background.backgroundControl();
- background.scrollBK(travel);
+ background.scrollBK(travel * 2);
  
- canvasContext.strokeRect(1,1, canvas.width-2, canvas.height - 2);
+ //canvasContext.strokeRect(1,1, canvas.width-2, canvas.height - 2);
  for (var i = 0; i < enemies.length; i++)
  {
-     enemy.setPos(enemies[i].x, enemies[i].y);
-     enemy.render();
+    
+     enemies[i].render();
      enemies[i].y += carSpeed; 
     
 
@@ -219,12 +210,14 @@ get yPos(){
    //console.log(score);
    score += elapsed *10;
 
-   if (score > 10)
+   if (score > 100)
    {
+
     //clearInterval(enemySpawn);
-    enemyRespawn = 3000;
+    //enemyRespawn = 3000;
    // setInterval(spawnenemies,2000);
-   }
+     carSpeed = 4;
+  }
    canvasContext.fillStyle = "blue";
    canvasContext.font = "bold 100px Comic Sans";
    canvasContext.fillText("Score : " + score.toString().substr(0,4), canvas.width/2, 100);
