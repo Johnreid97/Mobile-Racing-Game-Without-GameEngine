@@ -122,7 +122,7 @@ get yPos(){
  var mouseY;
  var mousedownID = -1;
 
-
+ var soundMgr
 
 
  function resizeCanvas() 
@@ -220,6 +220,7 @@ get yPos(){
  function update(delta)
  {
   worldWrap();
+  if(soundMgr != null) soundMgr.playSound(0);
  }
 
 

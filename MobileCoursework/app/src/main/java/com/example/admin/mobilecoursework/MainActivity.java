@@ -9,6 +9,8 @@ import android.webkit.WebView;
 public class MainActivity extends AppCompatActivity {
 
     WebView webView;
+    iSound iS;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -25,6 +27,8 @@ public class MainActivity extends AppCompatActivity {
                 | View.SYSTEM_UI_FLAG_IMMERSIVE;
         decorView.setSystemUiVisibility(uiOptions);
 
+        iS = new iSound(getApplicationContext());
+
         setContentView(R.layout.activity_main);
 
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
@@ -32,6 +36,8 @@ public class MainActivity extends AppCompatActivity {
 
         webView.getSettings().setJavaScriptEnabled(true);
         webView.loadUrl("file:///android_asset/infinateRunner.html");
+
+        webView.addJavascriptInterface(iS, "soundMgr");
 
     }
 }
