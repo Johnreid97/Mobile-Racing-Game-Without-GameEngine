@@ -186,10 +186,6 @@ get yPos(){
     break;
  }
  
-
-
- 
- 
  startTimeMS = Date.now();
  
  
@@ -220,7 +216,7 @@ function introrender(delta)
  for (var i = 0; i < enemies.length; i++)
  {
     
-     //enemies[i].render(); 
+    // enemies[i].render(); 
      enemies[i].y += carSpeed; 
      enemies[i].collisionDetection(player);   
  }
