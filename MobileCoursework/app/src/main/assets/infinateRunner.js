@@ -40,15 +40,7 @@ get yPos(){
   return this.y;
 }
 
-// get collider() 
-// {
-//   var rect = {x: this.x + this.collX, 
-//               y: this.y + this.collY, 
-//               width: this.collWidth,
-//               height: this.collHeight}
 
-// return rect;
-//}
 
  // Method
  setPos(newX,newY)
@@ -59,19 +51,9 @@ get yPos(){
 
  drawCollider()
  {
-  //canvasContext.strokeRect(this.collider.x,this.collider.y, this.collider.colliderWidth, this.collider.colliderHeight);
- // canvasContext.strokeRect(this.x +70, this.y +25, (this.sImage.width/2) -20,this.sImage.height - 30);
   canvasContext.strokeRect(this.x + 73, this.y+ 10, (this.sImage.width/2)-20 ,this.sImage.height-30 );
  }
 
-//  // Static Method
-//  static distance(a, b)
-//  {
-//  const dx = a.x - b.x;
-//  const dy = a.y - b.y;
-
-//  return Math.hypot(dx, dy);
-//  }
 
  // Method
  spriteType()
@@ -83,7 +65,7 @@ get yPos(){
  {
   if ( this.x +70 < ((target.x+73) + ((target.sImage.width/2 -20))) && ((this.x +70) + ((this.sImage.width/2)-20)) > target.x + 73 && this.y +25 < ((target.y+10) + (target.sImage.height-30)) && ((this.y +25) + (this.sImage.height-30)) > target.y +10)
   {
-   location.reload();
+   //location.reload();
   }  
  }
 
@@ -122,7 +104,9 @@ get yPos(){
  var mouseY;
  var mousedownID = -1;
 
- var soundMgr
+ var soundMgr;
+
+ var gameState;
 
 
  function resizeCanvas() 
@@ -142,14 +126,15 @@ get yPos(){
  function init() 
  {
 
-  //var obstacleclass = new obstacle();
+
+
  if (canvas.getContext) {
  //Set Event Listeners for window, mouse and touch
  
  window.addEventListener('resize', resizeCanvas, false);
  window.addEventListener('orientationchange', resizeCanvas, false);
 
- canvas.addEventListener("touchstart", touchDown, false);
+ canvas.addEventListener("touchstart", touchXY, false);
  canvas.addEventListener("touchmove", touchXY, true);
  canvas.addEventListener("touchend", touchUp, false);
  canvas.addEventListener("mousedown", KeyDown, false);
@@ -159,11 +144,13 @@ get yPos(){
 
  resizeCanvas();
 
+ gameState = "intro";
+
  background = new bkrnd(0,0,4,4,"Road.jpg", "Generic");
  player = new aSprite(0,0,1,1,"Audi.png",  "Generic",);
  
  player.setPos((canvas.width - player.sImage.width)/2, ( canvas.height - player.sImage.height )/1.3);
- //console.log(player.x);
+ 
  startTimeMS = Date.now();
 
  enemySpawn = setInterval(spawnenemies, enemyRespawn);
@@ -175,6 +162,7 @@ get yPos(){
  {
   
  console.log("gameLoop");
+
  elapsed = (Date.now() - startTimeMS)/1000;
  travel += elapsed * 100;
  if (travel > background.sImage.height)
@@ -182,45 +170,73 @@ get yPos(){
  travel = 0;
  }
 
- update(elapsed);
- render(elapsed);
+ switch (gameState)
+ {
+    case "intro":
+    introrender(elapsed);
+    break;
+
+    case "game":
+    gamerender(elapsed);
+    update(elapsed);
+    break;
+
+    case "end":
+    endrender(elaspsed)
+    break;
+ }
+ 
+
+
+ 
+ 
  startTimeMS = Date.now();
  
- scoreCount();
+ 
 
  //player.drawCollider();
  requestAnimationFrame(gameLoop);
  }
+  
 
 
+function introrender(delta)
+{
+  canvasContext.clearRect(0,0,canvas.width, canvas.height);
+  background.scrollBK(travel * 2);
+  canvasContext.fillStyle = "blue";
+  canvasContext.font = "bold 50px Comic Sans";
+  canvasContext.fillText("Tap the Screen to Begin!", canvas.width/2 - 200, 100);
+  canvasContext.fillText("Tap and Hold Either Side of the Screen to Move", canvas.width/2 - 350, canvas.height/2, 1000)
 
- function render(delta) 
+}
+
+ function gamerender(delta) 
  {
  canvasContext.clearRect(0,0,canvas.width, canvas.height);
  
  background.scrollBK(travel * 2);
  
- //canvasContext.strokeRect(1,1, canvas.width-4, canvas.height - 4);
  for (var i = 0; i < enemies.length; i++)
  {
     
-     enemies[i].render(); 
+     //enemies[i].render(); 
      enemies[i].y += carSpeed; 
-
-     enemies[i].collisionDetection(player); 
-	//  if ( player.x +70 < ((enemies[i].x+73) + ((enemies[i].sImage.width/2 -20))) && ((player.x +70) + ((player.sImage.width/2)-20)) > enemies[i].x + 73 && player.y +25 < ((enemies[i].y+10) + (enemies[i].sImage.height-30)) && ((player.y +25) + (player.sImage.height-30)) > enemies[i].y +10)
-	//  {
-  //   location.reload();
-    
-  //  }    
+     enemies[i].collisionDetection(player);   
  }
   player.render();
+ }
+
+ function endrender(delta)
+ {
+
  }
 
  function update(delta)
  {
   worldWrap();
-  if(soundMgr != null) soundMgr.playSound(0);
+  scoreCount();
+  //if(soundMgr != null) soundMgr.playSound(0);
  }
 
 
@@ -235,14 +251,12 @@ get yPos(){
 
  function scoreCount()
  {
-   //console.log(score);
-   score += elapsed *10;
+   score += elapsed * 10;
 
    if (score > 100)
    {
 
-    
-  }
+   }
    canvasContext.fillStyle = "blue";
    canvasContext.font = "bold 50px Comic Sans";
    canvasContext.fillText("Score : " + score.toString().substr(0,4), background.x + 200, 100);
