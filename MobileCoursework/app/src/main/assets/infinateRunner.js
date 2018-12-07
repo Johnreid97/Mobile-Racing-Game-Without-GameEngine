@@ -65,7 +65,7 @@ get yPos(){
  {
   if ( this.x +70 < ((target.x+73) + ((target.sImage.width/2 -20))) && ((this.x +70) + ((this.sImage.width/2)-20)) > target.x + 73 && this.y +25 < ((target.y+10) + (target.sImage.height-30)) && ((this.y +25) + (this.sImage.height-30)) > target.y +10)
   {
-   //location.reload();
+   gameState = "end";
   }  
  }
 
@@ -96,9 +96,13 @@ get yPos(){
  var canvasContext;
  var travel = 0;
  var player;
+ 
+ 
  var enemySpawn;
  var score  = 0;
  var elapsed;
+ var enemy;
+ var randomEnemy;
 
  var mouseX;
  var mouseY;
@@ -107,6 +111,10 @@ get yPos(){
  var soundMgr;
 
  var gameState;
+ var spawnBool = false;
+
+ 
+ 
 
 
  function resizeCanvas() 
@@ -153,7 +161,7 @@ get yPos(){
  
  startTimeMS = Date.now();
 
- enemySpawn = setInterval(spawnenemies, enemyRespawn);
+
  gameLoop();
  }
  }
@@ -182,7 +190,7 @@ get yPos(){
     break;
 
     case "end":
-    endrender(elaspsed)
+    endrender(elapsed);
     break;
  }
  
@@ -214,25 +222,40 @@ function introrender(delta)
  background.scrollBK(travel * 2);
  
  for (var i = 0; i < enemies.length; i++)
- {
-    
-    // enemies[i].render(); 
+ {     
+     enemies[i].render();
      enemies[i].y += carSpeed; 
-     enemies[i].collisionDetection(player);   
+     enemies[i].collisionDetection(player); 
+     //if (enemies[i].x == movementX)
+     //{
+      // enemies[i].x += 2;
+     //} 
+     //worldWrap(enemies[i]); 
+     
  }
   player.render();
  }
 
  function endrender(delta)
  {
-
+  clearInterval(enemySpawn);  
+  canvasContext.clearRect(0,0,canvas.width, canvas.height);
+  background.scrollBK(travel * 2);
+  canvasContext.fillStyle = "blue";
+  canvasContext.font = "bold 50px Comic Sans";
+  canvasContext.fillText("Tap the Screen to Retry!", canvas.width/2 - 200, 100);
+  canvasContext.fillText("Your Score was: " + score.toString().substr(0,4), canvas.width/2, canvas.height/2, 300);
+  Reset();
  }
 
  function update(delta)
  {
-  worldWrap();
+  worldWrap(player);
   scoreCount();
-  //if(soundMgr != null) soundMgr.playSound(0);
+  MoveEnemy();
+
+
+  
  }
 
 
@@ -251,7 +274,7 @@ function introrender(delta)
 
    if (score > 100)
    {
-
+    
    }
    canvasContext.fillStyle = "blue";
    canvasContext.font = "bold 50px Comic Sans";
@@ -259,19 +282,42 @@ function introrender(delta)
  }
  
 
- function worldWrap()
+ function worldWrap(object)
  {
-  if (player.x > canvas.width)
+  if (object.x > canvas.width)
   {
-    player.setPos(0,player.y);
+    object.setPos(object.x - object.x,object.y);
   }
   if (player.x < 0)
   {
-    player.setPos(canvas.width,player.y);
+    object.setPos(canvas.width,object.y);
   }
-
-
  }
+
+ 
+function MoveEnemy()
+{
+  movementX += 2;
+}
+
+ 
+
+function Reset()
+{
+  
+  player.setPos((canvas.width - player.sImage.width)/2, ( canvas.height - player.sImage.height )/1.3);
+
+  for (var i = 0; i < enemies.length; i++)
+ {    
+     delete enemies[i].x;   
+     delete enemies[i].y;  
+     enemies[i].clearRect;
+ }
+
+}
+
+
+ 
 
 
 

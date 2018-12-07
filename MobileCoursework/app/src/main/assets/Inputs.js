@@ -37,7 +37,13 @@
 
  if (gameState == "intro" || gameState == "end")
  {
+    score = 0;
+    if(soundMgr != null) soundMgr.playMusic(0);
     gameState = "game"
+    //spawnBool = true;
+    enemySpawn = setInterval(spawnenemies, enemyRespawn);
+    
+    console.Log(spawnBool);
  }
 
 }
@@ -57,7 +63,10 @@ if (mousedownID == -1)
    }
    if (gameState == "intro" || gameState == "end")
    {
+      score = 0;
       gameState = "game"
+      
+      enemySpawn = setInterval(spawnenemies, enemyRespawn);
    }
 
  }
@@ -65,14 +74,26 @@ if (mousedownID == -1)
  function whilemousedown()
  {
 
-     if (mouseX > canvas.width/2 || lastPt.x > canvas.width/2)
+     if (mouseX > canvas.width/2)
    {
       //player.x = player.lerp(player.x, mouseX, 0.01);
       player.x += 5;
    }
-   else if(mouseX < canvas.width/2 || lastPt.x < canvas.width/2)
-   {
-      //player.x = player.lerp(player.x, mouseX, 0.01);
-      player.x -= 5;
-   }
+    else if(mouseX < canvas.width/2)
+      {
+         //player.x = player.lerp(player.x, mouseX, 0.01);
+         player.x -= 5;
+      }
+
+    if (lastPt != null && lastPt.x > canvas.width/2)
+      {
+         //player.x = player.lerp(player.x, mouseX, 0.01);
+         player.x += 5;
+      }
+       else if(lastPt!= null && lastPt.x < canvas.width/2)
+         {
+            //player.x = player.lerp(player.x, mouseX, 0.01);
+            player.x -= 5;
+         }
+
  }
