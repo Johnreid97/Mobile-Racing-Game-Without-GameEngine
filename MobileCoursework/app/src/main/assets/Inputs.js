@@ -63,6 +63,7 @@ if (mousedownID == -1)
    }
    if (gameState == "intro" || gameState == "end")
    {
+      if(soundMgr != null) soundMgr.playMusic(0);
       score = 0;
       gameState = "game"
       

@@ -35,7 +35,7 @@ public class iSound {
         //load sounds into sound pool
         try {
             //Load sound using the asset file descriptor
-            AssetFileDescriptor afd = ctx.getAssets().openFd("GroundHit.mp3");
+            AssetFileDescriptor afd = ctx.getAssets().openFd("carcrash.wav");
             //store the id outputted by the sound pool in the sound effects array
             soundIDs[0] = sounds.load(afd.getFileDescriptor(), afd.getStartOffset(), afd.getLength(), 0);
             afd.close();

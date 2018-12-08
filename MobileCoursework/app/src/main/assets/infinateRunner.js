@@ -66,6 +66,7 @@ get yPos(){
   if ( this.x +70 < ((target.x+73) + ((target.sImage.width/2 -20))) && ((this.x +70) + ((this.sImage.width/2)-20)) > target.x + 73 && this.y +25 < ((target.y+10) + (target.sImage.height-30)) && ((this.y +25) + (this.sImage.height-30)) > target.y +10)
   {
    gameState = "end";
+   if(soundMgr != null) soundMgr.playSound(0);
   }  
  }
 
