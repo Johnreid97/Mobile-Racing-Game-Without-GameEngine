@@ -8,11 +8,8 @@ class obstacles extends aSprite
 }
 
 
-
+//Enemy Variables
 var enemies = [];
-
-//var debug = [];
-
 var enemyRespawn = 2000;
 var carSpeed = 5;
 var obstacleX = 0;
@@ -23,13 +20,14 @@ var bkgrndOffset = 50;
 
 function getRandom(min, max)
 {
-	
+	//gets the enemies random X-position 
 	obstacleX = Math.floor(Math.random() * (max - min)) + min;
 }
 
 function spawnenemies()
 {
    // var randomNum = Math.floor(Math.random() * (60 - 0) + 0);
+   // gets random x-position between each side of the cavas 
     getRandom(0, canvas.width);
     
 
@@ -41,9 +39,12 @@ function spawnenemies()
    //}
     //else
     //{
+
+    // adds a new enemy to the array
     enemies.push(new aSprite (obstacleX,obstacleY,1,1,"Police.png", "Generic"))
+    
     //}
-    //debug.push(new aSprite(100,400, 1,1, "Audi.png", "Generic"));
+    
     
 }
 
