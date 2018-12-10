@@ -42,6 +42,7 @@
     gameState = "game"
     
     enemySpawn = setInterval(spawnenemies, enemyRespawn);
+    movementX = setInterval(moveenemyX,6000);
     
     
  }
@@ -68,6 +69,7 @@ if (mousedownID == -1)
       gameState = "game"
       
       enemySpawn = setInterval(spawnenemies, enemyRespawn);
+     
    }
 
  }

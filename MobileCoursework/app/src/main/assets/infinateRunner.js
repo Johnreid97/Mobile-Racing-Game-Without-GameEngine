@@ -3,20 +3,17 @@ document.write("<script src='Obstacles.js' type='text/javascript'></script>");
 document.write("<script src='Inputs.js' type='text/javascript'></script>");
 
 
-// base classed used as a base for other classes
-class aSprite 
+// base classed used for the player and as a base for other classes
+class thePlayer 
 {
- constructor(x, y, ScaleX, ScaleY, imageSRC, spType){
+ constructor(x, y, ScaleX, ScaleY, imageSRC){
  //this.zindex = 0;
  this.x = x;
  this.y = y;
  this.sizeX = ScaleX;
  this.sizeY = ScaleY;
- this.sType = spType;
  this.sImage = new Image();
  this.sImage.src = imageSRC;
- 
- 
  }
 
  //Method
@@ -29,21 +26,6 @@ class aSprite
  canvasContext.restore();
  }
 
-
-
- 
- // Getter
-//  get xPos()
-// {
-//   return this.x;
-// }
-
-// get yPos(){
-//   return this.y;
-// }
-
-
-
  // Method
  setPos(newX,newY)
  {
@@ -52,24 +34,12 @@ class aSprite
  this.y = newY;
  }
 
- //Method
- drawCollider()
- {
-   //Draws the a box that shows the collider
-  canvasContext.strokeRect(this.x + 73, this.y+ 10, (this.sImage.width/2)-20 ,this.sImage.height-30 );
- }
-
-
-//  // Method
-//  spriteType()
-//  {
-//  console.log('I am an instance of aSprite!!!');
-//  }
-
  collisionDetection(target)
  {
    //Checks if there is a collision between the player and enemy and changes the game state
-  if ( this.x +70 < ((target.x+73) + ((target.sImage.width/2 -20))) && ((this.x +70) + ((this.sImage.width/2)-20)) > target.x + 73 && this.y +25 < ((target.y+10) + (target.sImage.height-30)) && ((this.y +25) + (this.sImage.height-30)) > target.y +10)
+  if ( this.x +70 < ((target.x+73) + ((target.sImage.width/2 -20))) && 
+  ((this.x +70) + ((this.sImage.width/2)-20)) > target.x + 73 && 
+  this.y +25 < ((target.y+10) + (target.sImage.height-30)) && ((this.y +25) + (this.sImage.height-30)) > target.y +10)
   {
    gameState = "end";
    //plays a sound
@@ -79,7 +49,7 @@ class aSprite
 
  }
 
- class bkrnd extends aSprite
+ class bkrnd extends thePlayer
  {
  // Method
  scrollBK(delta)
@@ -138,15 +108,12 @@ class aSprite
   //Loads the game canvas and sets it to 2d
  canvas = document.getElementById('gameCanvas');
  canvasContext = canvas.getContext('2d');
- init();
+ Initialise();
  }
 
 
- function init() 
+ function Initialise() 
  {
-
-
-
  if (canvas.getContext) {
  
  //Sets event listeners for touch and mouse clicks
@@ -154,7 +121,7 @@ class aSprite
  window.addEventListener('orientationchange', resizeCanvas, false);
 
  canvas.addEventListener("touchstart", touchXY, false);
- canvas.addEventListener("touchmove", touchXY, true);
+ //canvas.addEventListener("touchmove", touchXY, true);
  canvas.addEventListener("touchend", touchUp, false);
  canvas.addEventListener("mousedown", KeyDown, false);
  canvas.addEventListener("mouseup", touchUp, false);
@@ -167,14 +134,13 @@ class aSprite
  gameState = "intro";
 
  //sets variables to inherit from the respected classes
- background = new bkrnd(0,0,4,4,"Road.jpg", "Generic");
- player = new aSprite(0,0,1,1,"Audi.png",  "Generic",);
+ background = new bkrnd(0,0,4,4,"Road.jpg");
+ player = new thePlayer(0,0,1,1,"Audi.png");
  
  //Sets the position of the player 
  player.setPos((canvas.width - player.sImage.width)/2, ( canvas.height - player.sImage.height )/1.3);
  
  startTimeMS = Date.now();
-
 
  gameLoop();
  }
@@ -184,7 +150,6 @@ class aSprite
  {
   
  console.log("gameLoop");
-
  //Resets the backround image if it goes past a certain point
  elapsed = (Date.now() - startTimeMS)/1000;
  travel += elapsed * 100;
@@ -212,9 +177,6 @@ class aSprite
  
  startTimeMS = Date.now();
  
- 
-
- //player.drawCollider();
  requestAnimationFrame(gameLoop);
  }
   
@@ -244,13 +206,10 @@ function introrender(delta)
  {     
      enemies[i].render();
      enemies[i].y += carSpeed; 
+     enemies[i].Movement();
      enemies[i].collisionDetection(player); 
-     //if (enemies[i].x == movementX)
-     //{
-      // enemies[i].x += 2;
-     //} 
-     //worldWrap(enemies[i]); 
-     
+     worldWrap(enemies[i]);
+      
  }
  //renders the player
   player.render();
@@ -271,34 +230,16 @@ function introrender(delta)
 
  function update(delta)
  {
-  
   worldWrap(player);
   scoreCount();
-  //MoveEnemy();
-
-
-  
  }
 
-
-
-//  function styleText(txtColour, txtFont, txtAlign, txtBaseline)
-//  {
-//  canvasContext.fillStyle = txtColour;
-//  canvasContext.font = txtFont;
-//  canvasContext.textAlign = txtAlign;
-//  canvasContext.textBaseline = txtBaseline;
-//  }
 
  function scoreCount()
  {
    //adds to the score
    score += elapsed * 10;
 
-   if (score > 100)
-   {
-    
-   }
    //displays the score
    canvasContext.fillStyle = "blue";
    canvasContext.font = "bold 50px Comic Sans";
@@ -321,7 +262,7 @@ function introrender(delta)
 
  
 // function MoveEnemy()
-// {
+// {  
 //   movementX += 2;
 // }
 
