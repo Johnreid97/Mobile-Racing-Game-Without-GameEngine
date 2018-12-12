@@ -1,6 +1,7 @@
 
 document.write("<script src='Obstacles.js' type='text/javascript'></script>");
 document.write("<script src='Inputs.js' type='text/javascript'></script>");
+document.write("<script src='storage.js' type='text/javascript'></script>");
 
 
 // base classed used for the player and as a base for other classes
@@ -22,7 +23,8 @@ class thePlayer
 // renders and rescales the image
  canvasContext.save();
  canvasContext.scale(this.sizeX,this.sizeY);
- canvasContext.drawImage(this.sImage,this.x, this.y, this.sImage.width,this.sImage.height);
+ canvasContext.drawImage(this.sImage,this.x, this.y,this.sImage.height,this.sImage.width);
+ //canvasContext.drawImage(this.sImage,this.x, this.y);
  canvasContext.restore();
  }
 
@@ -43,7 +45,11 @@ class thePlayer
   {
    gameState = "end";
    //plays a sound
-   if(soundMgr != null) soundMgr.playSound(0);
+   if(soundMgr != null) 
+   {
+   soundMgr.playSound(0);
+   }
+   SetHighScore();
   }  
  }
 
@@ -57,17 +63,17 @@ class thePlayer
 //Draws 3 images and moves them and restores them to give the illusion of movement
  canvasContext.save();
  canvasContext.scale(this.sizeX,this.sizeY);
- canvasContext.translate( 0, delta);
+ canvasContext.translate(0, delta);
  
- canvasContext.drawImage(this.sImage, 0, -this.sImage.height, canvas.width/4, this.sImage.height);
- canvasContext.drawImage(this.sImage,0, 0, canvas.width/4, this.sImage.height);
- canvasContext.drawImage(this.sImage, 0, this.sImage.height,canvas.width/4, this.sImage.height);
- canvasContext.drawImage(this.sImage, 0, -this.sImage.height*2 ,canvas.width/4, this.sImage.height)
+
+
+ canvasContext.drawImage(this.sImage, 0, -this.sImage.height, canvas.width, canvas.height);
+ canvasContext.drawImage(this.sImage,0, 0, canvas.width, canvas.height);
+ canvasContext.drawImage(this.sImage, 0, this.sImage.height,canvas.width, canvas.height);
+ canvasContext.drawImage(this.sImage, 0, -this.sImage.height*2 ,canvas.width, canvas.height)
  
  canvasContext.restore();
  }
-
-
  }
 
  // Canvas variables
@@ -78,6 +84,7 @@ class thePlayer
  //Player variable
  var player;
  var score  = 0;
+ var highScore = 0;
  
 
  
@@ -108,6 +115,20 @@ class thePlayer
   //Loads the game canvas and sets it to 2d
  canvas = document.getElementById('gameCanvas');
  canvasContext = canvas.getContext('2d');
+
+ if (StorageAvailable('localStorage'))
+ {
+   if (localStorage.getItem('HighScore'))
+   {
+     SavedScores();
+   }
+   console.log("Local Storage Available");
+   
+ }
+ else 
+ {
+   console.log("Local Storage Not Available");
+ }
  Initialise();
  }
 
@@ -121,7 +142,6 @@ class thePlayer
  window.addEventListener('orientationchange', resizeCanvas, false);
 
  canvas.addEventListener("touchstart", touchXY, false);
- //canvas.addEventListener("touchmove", touchXY, true);
  canvas.addEventListener("touchend", touchUp, false);
  canvas.addEventListener("mousedown", KeyDown, false);
  canvas.addEventListener("mouseup", touchUp, false);
@@ -129,12 +149,12 @@ class thePlayer
  document.body.addEventListener("touchcancel", touchUp, false);
 
  resizeCanvas();
-
+ if(soundMgr != null) soundMgr.playMusic(0);
  //Sets the game state 
  gameState = "intro";
 
  //sets variables to inherit from the respected classes
- background = new bkrnd(0,0,4,4,"Road.jpg");
+ background = new bkrnd(0,0,1,4,"Road.jpg");
  player = new thePlayer(0,0,1,1,"Audi.png");
  
  //Sets the position of the player 
@@ -150,7 +170,7 @@ class thePlayer
  {
   
  console.log("gameLoop");
- //Resets the backround image if it goes past a certain point
+ //Resets the background image if it goes past a certain point
  elapsed = (Date.now() - startTimeMS)/1000;
  travel += elapsed * 100;
  if (travel > background.sImage.height)
@@ -184,13 +204,14 @@ class thePlayer
 
 function introrender(delta)
 {
-  //reders text, background for the intro section of the screen
+  //renders text, background for the intro section of the screen
   canvasContext.clearRect(0,0,canvas.width, canvas.height);
   background.scrollBK(travel * 2);
   canvasContext.fillStyle = "blue";
+  canvasContext.textAlign = "center";
   canvasContext.font = "bold 50px Comic Sans";
-  canvasContext.fillText("Tap the Screen to Begin!", canvas.width/2 - 200, 100);
-  canvasContext.fillText("Tap and Hold Either Side of the Screen to Move", canvas.width/2 - 350, canvas.height/2, 1000)
+  canvasContext.fillText("Tap the Screen to Begin!", canvas.width/2, canvas.height/6, canvas.width);
+  canvasContext.fillText("Tap and Hold Either Side of the Screen to Move", canvas.width/2, canvas.height/2, canvas.width/1.5)
 
 }
 
@@ -222,10 +243,14 @@ function introrender(delta)
   canvasContext.clearRect(0,0,canvas.width, canvas.height);
   background.scrollBK(travel * 2);
   canvasContext.fillStyle = "blue";
+  canvasContext.textAlign = "center";
   canvasContext.font = "bold 50px Comic Sans";
-  canvasContext.fillText("Tap the Screen to Retry!", canvas.width/2 - 200, 100);
-  canvasContext.fillText("Your Score was: " + score.toString().substr(0,4), canvas.width/2, canvas.height/2, 300);
+  canvasContext.fillText("Game Over! Tap the Screen to Retry!", canvas.width/2, 100, canvas.width);
+  canvasContext.fillText("Your Score was: " + score.toString().substr(0,4), canvas.width/2, canvas.height/2, canvas.width);
   Reset();
+  
+  canvasContext.fillText("HighScore:" + highScore.toString().substr(0,4), canvas.width/2, canvas.height/4, canvas.width);
+
  }
 
  function update(delta)
@@ -242,8 +267,9 @@ function introrender(delta)
 
    //displays the score
    canvasContext.fillStyle = "blue";
+   canvasContext.textAlign = "center";
    canvasContext.font = "bold 50px Comic Sans";
-   canvasContext.fillText("Score : " + score.toString().substr(0,4), background.x + 200, 100);
+   canvasContext.fillText("Score : " + score.toString().substr(0,4), canvas.width/8 ,  canvas.height/12, canvas.width);
  }
  
 
@@ -253,19 +279,15 @@ function introrender(delta)
   if (object.x > canvas.width)
   {
     object.setPos(object.x - object.x,object.y);
+    if(soundMgr != null) soundMgr.playSound(1);
   }
   if (player.x < 0)
   {
     object.setPos(canvas.width,object.y);
+    if(soundMgr != null) soundMgr.playSound(1);
+
   }
  }
-
- 
-// function MoveEnemy()
-// {  
-//   movementX += 2;
-// }
-
  
 
 function Reset()
@@ -281,6 +303,15 @@ function Reset()
      enemies[i].clearRect;
  }
 
+}
+
+function SetHighScore()
+{
+  if (score > highScore)
+  {
+    localStorage.setItem('HighScore', score);
+    highScore = score;
+  }
 }
 
 

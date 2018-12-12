@@ -38,7 +38,7 @@
  {
     //resets the score, plays the background music, starts the game and spawns the enemies
     score = 0;
-    if(soundMgr != null) soundMgr.playMusic(0);
+
     gameState = "game"
     
     enemySpawn = setInterval(spawnenemies, enemyRespawn);
@@ -64,7 +64,7 @@ if (mousedownID == -1)
    }
    if (gameState == "intro" || gameState == "end")
    {
-      if(soundMgr != null) soundMgr.playMusic(0);
+
       score = 0;
       gameState = "game"
       
